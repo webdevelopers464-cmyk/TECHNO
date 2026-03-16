@@ -240,35 +240,6 @@
         .submit-btn:active { transform: translateY(0); }
 
         /* ====== STATS ROW ====== */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 16px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-
-        .stat-num {
-            font-family: 'Syne', sans-serif;
-            font-size: 26px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label { font-size: 12px; color: var(--text3); font-weight: 500; margin-top: 2px; }
 
         /* ====== ORDERS TABLE ====== */
         .table-wrap { overflow-x: auto; }
@@ -446,8 +417,6 @@
         /* ====== RESPONSIVE ====== */
         @media (max-width: 600px) {
             header { padding: 0 1rem; }
-            .stats-row { grid-template-columns: repeat(3,1fr); gap: 8px; }
-            .stat-num { font-size: 20px; }
         }
     </style>
 </head>
@@ -475,12 +444,12 @@
 
                 <div class="form-group">
                     <label class="form-label"><span class="label-icon">👤</span> Full Name</label>
-                    <input class="form-control" type="text" id="fullName" name="fullName" placeholder="e.g. amna, bilal" required>
+                    <input class="form-control" type="text" id="fullName" name="fullName" placeholder="e.g. Ahmed Ali" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label"><span class="label-icon">📞</span> Phone Number</label>
-                    <input class="form-control" type="tel" id="phoneNumber" name="phoneNumber" placeholder="e.g. 0000 0000000" required>
+                    <input class="form-control" type="tel" id="phoneNumber" name="phoneNumber" placeholder="e.g. 0300 1234567" required>
                 </div>
 
                 <div class="form-group">
@@ -528,22 +497,6 @@
 
     <!-- RIGHT: ORDERS TABLE -->
     <div style="display:flex; flex-direction:column; gap:20px;">
-
-        <!-- STATS -->
-        <div class="stats-row" id="statsRow">
-            <div class="stat-card">
-                <div class="stat-num" id="statTotal">0</div>
-                <div class="stat-label">Total Orders</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num" id="statItems">0</div>
-                <div class="stat-label">Total Items</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-num" id="statValue">0</div>
-                <div class="stat-label">Total Value (Rs)</div>
-            </div>
-        </div>
 
         <!-- TABLE CARD -->
         <div class="card" style="animation: slideUp 0.5s ease both 0.1s; opacity:0; animation-fill-mode:forwards;">
@@ -645,16 +598,6 @@ document.getElementById('searchInput').addEventListener('input', function(){
     renderOrders();
 });
 
-function updateStats(){
-    const totalOrders = orders.length;
-    const totalItems = orders.reduce((s,o) => s + o.quantity, 0);
-    const totalValue = orders.reduce((s,o) => s + o.total, 0);
-    document.getElementById('statTotal').textContent = totalOrders;
-    document.getElementById('statItems').textContent = totalItems;
-    document.getElementById('statValue').textContent = totalValue >= 1000
-        ? (totalValue/1000).toFixed(1) + 'k'
-        : totalValue;
-}
 
 function renderOrders(){
     const tbody = document.getElementById('ordersTableBody');
@@ -671,7 +614,6 @@ function renderOrders(){
     if(filtered.length === 0){
         tbody.innerHTML = '';
         emptyState.style.display = 'block';
-        updateStats();
         return;
     }
 
@@ -694,7 +636,6 @@ function renderOrders(){
         </tr>`;
     }).join('');
 
-    updateStats();
 }
 
 function editOrder(i){
