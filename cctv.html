@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TECHNO - CCTV Cameras</title>
+
+<style>
+html{ scroll-behavior: smooth; }
+body{ margin:0; font-family:sans-serif; }
+
+/* HEADER */
+header{
+display:flex; justify-content:space-around; align-items:center;
+padding:15px; background:black; position:sticky; top:0; z-index:1000;
+}
+.logo{ color:white; font-size:20px; text-decoration:none; }
+nav{ display:flex; gap:20px; align-items:center; }
+nav a{ color:white; text-decoration:none; }
+.dropdown{ position:relative; }
+.dropdown-content{
+display:none; position:absolute; top:30px; background:black;
+flex-direction:column; min-width:150px; z-index:9999;
+}
+.dropdown-content a{ padding:10px; display:block; border-bottom:1px solid gray; }
+.dropdown.show .dropdown-content{ display:block; }
+.menu-btn{ display:none; }
+
+/* CART BUTTON */
+.cart-icon-btn{
+background:none; border:none; color:white; font-size:22px;
+cursor:pointer; position:relative; padding:0;
+}
+.cart-badge{
+position:absolute; top:-8px; right:-10px;
+background:#e63946; color:white; font-size:11px;
+font-weight:bold; border-radius:50%; width:18px; height:18px;
+display:none; align-items:center; justify-content:center;
+}
+.cart-badge.show{ display:flex; }
+
+/* MOBILE MENU */
+@media (max-width:768px){
+nav{
+position:fixed; left:-250px; top:0; width:250px; height:100%;
+background:black; flex-direction:column; padding-top:60px;
+transition:0.3s; z-index:999;
+}
+nav a{ padding:15px; border-bottom:1px solid gray; }
+nav.show{ left:0; }
+.menu-btn{ display:block; font-size:25px; background:none; border:none; color:white; cursor:pointer; }
+}
+
+/* MAIN IMAGE */
+.img1{ width:100%; }
+
+/* ===== PRODUCTS SECTION ===== */
+.products-section{ padding:40px 20px; background:#f5f5f5; }
+.products-section h2{ text-align:center; font-size:28px; margin-bottom:30px; color:#222; letter-spacing:1px; }
+.products-grid{ display:flex; flex-wrap:wrap; gap:24px; justify-content:center; max-width:1200px; margin:0 auto; }
+
+/* PRODUCT CARD */
+.product-card{
+background:white; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.10);
+width:250px; position:relative; overflow:hidden;
+transition:transform 0.3s ease,box-shadow 0.3s ease;
+display:flex; flex-direction:column;
+}
+.product-card:hover{ transform:translateY(-6px); box-shadow:0 12px 32px rgba(0,0,0,0.18); }
+
+.sale-badge{
+position:absolute; top:12px; right:12px; background:#4a2ecf;
+color:white; font-size:12px; font-weight:bold; padding:4px 10px;
+border-radius:4px; z-index:2;
+}
+.product-card img{
+width:100%; height:190px; object-fit:contain;
+padding:16px 16px 0 16px; background:white; box-sizing:border-box;
+}
+.product-info{ padding:14px 16px; flex:1; display:flex; flex-direction:column; }
+.product-name{ font-size:13.5px; color:#222; text-align:center; font-weight:600; line-height:1.5; margin-bottom:10px; min-height:60px; }
+.stars{ color:#f5a623; font-size:16px; text-align:center; margin-bottom:8px; letter-spacing:2px; }
+.price-box{ display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:14px; }
+.old-price{ text-decoration:line-through; color:#aaa; font-size:13px; }
+.new-price{ color:#222; font-size:15px; font-weight:bold; }
+.card-btns{ display:flex; gap:8px; padding:0 16px 16px 16px; }
+.btn-cart{
+flex:1; padding:9px 6px; border:2px solid #222; background:white;
+color:#222; font-size:13px; font-weight:600; border-radius:6px;
+cursor:pointer; transition:background 0.2s,color 0.2s;
+}
+.btn-cart:hover{ background:#222; color:white; }
+.btn-buy{
+flex:1; padding:9px 6px; border:none; background:#4a2ecf; color:white;
+font-size:13px; font-weight:600; border-radius:6px; cursor:pointer; transition:background 0.2s;
+}
+.btn-buy:hover{ background:#3520a8; }
+
+/* ===== CART SIDEBAR ===== */
+.cart-overlay{
+position:fixed; top:0; left:0; width:100%; height:100%;
+background:rgba(0,0,0,0.5); z-index:9998; display:none;
+}
+.cart-overlay.show{ display:block; }
+.cart-sidebar{
+position:fixed; top:0; right:-420px; width:400px; height:100%;
+background:white; z-index:9999; display:flex; flex-direction:column;
+box-shadow:-4px 0 20px rgba(0,0,0,0.2); transition:right 0.35s ease;
+}
+.cart-sidebar.open{ right:0; }
+.cart-header{ display:flex; justify-content:space-between; align-items:center; padding:20px; background:#111; color:white; }
+.cart-header h3{ margin:0; font-size:20px; }
+.cart-close-btn{ background:none; border:none; color:white; font-size:28px; cursor:pointer; line-height:1; padding:0; }
+.cart-close-btn:hover{ color:#e63946; }
+.cart-items{ flex:1; overflow-y:auto; padding:16px; }
+.cart-empty{ text-align:center; padding:60px 20px; color:#aaa; font-size:16px; }
+.cart-empty .empty-icon{ font-size:60px; display:block; margin-bottom:12px; }
+.cart-item{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #eee; }
+.cart-item img{ width:65px; height:55px; object-fit:contain; border-radius:6px; background:#f5f5f5; padding:4px; }
+.cart-item-info{ flex:1; }
+.cart-item-name{ font-size:13px; font-weight:600; color:#222; margin-bottom:4px; }
+.cart-item-price{ font-size:13px; color:#4a2ecf; font-weight:bold; }
+.qty-controls{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+.qty-btn{
+width:26px; height:26px; border:1px solid #ddd; background:white;
+border-radius:4px; font-size:16px; cursor:pointer; display:flex;
+align-items:center; justify-content:center; font-weight:bold; transition:background 0.2s;
+}
+.qty-btn:hover{ background:#f0f0f0; }
+.qty-num{ font-size:14px; font-weight:600; min-width:20px; text-align:center; }
+.cart-item-remove{ background:none; border:none; color:#ccc; font-size:20px; cursor:pointer; padding:0; transition:color 0.2s; }
+.cart-item-remove:hover{ color:#e63946; }
+.cart-footer{ padding:16px 20px; border-top:2px solid #eee; background:#fafafa; }
+.cart-subtotal{ display:flex; justify-content:space-between; align-items:center; font-size:16px; font-weight:700; margin-bottom:14px; }
+.cart-subtotal span:last-child{ color:#4a2ecf; font-size:18px; }
+.btn-checkout{ width:100%; padding:14px; background:#4a2ecf; color:white; border:none; border-radius:8px; font-size:16px; font-weight:700; cursor:pointer; transition:background 0.2s; }
+.btn-checkout:hover{ background:#3520a8; }
+.btn-clear-cart{ width:100%; padding:10px; background:white; color:#e63946; border:2px solid #e63946; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; margin-top:8px; transition:background 0.2s,color 0.2s; }
+.btn-clear-cart:hover{ background:#e63946; color:white; }
+
+/* TOAST */
+.toast{
+position:fixed; bottom:30px; left:50%;
+transform:translateX(-50%) translateY(80px);
+background:#222; color:white; padding:12px 28px;
+border-radius:30px; font-size:14px; z-index:99999;
+opacity:0; transition:all 0.35s ease; pointer-events:none; white-space:nowrap;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* LIGHTBOX */
+.lightbox-overlay{
+display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+background:rgba(0,0,0,0.88); z-index:99999; justify-content:center; align-items:center;
+}
+.lightbox-overlay.active{ display:flex; }
+.lightbox-overlay img{ max-width:88vw; max-height:85vh; border-radius:8px; }
+.lightbox-close{ position:absolute; top:24px; right:36px; color:white; font-size:42px; cursor:pointer; }
+.lightbox-close:hover{ color:#f44; }
+.lightbox-prev, .lightbox-next{
+position:absolute; top:50%; transform:translateY(-50%);
+color:white; font-size:48px; cursor:pointer;
+background:rgba(255,255,255,0.08); border:none; border-radius:50%;
+width:56px; height:56px; display:flex; align-items:center; justify-content:center;
+}
+.lightbox-prev{ left:20px; } .lightbox-next{ right:20px; }
+
+/* SCROLL FADE */
+.fade-in{ opacity:0; transform:translateY(30px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.fade-in.visible{ opacity:1; transform:translateY(0); }
+
+/* FOOTER */
+.footer{ display:flex; justify-content:space-around; margin-top:0; padding-top:50px; background:#000000; color:white; width:100%; height:200px; box-sizing:border-box; }
+.ab{ color:white; }
+
+@media(max-width:425px){
+  .footer{ flex-direction:column; text-align:center; align-items:center; height:auto; padding-bottom:30px; }
+  .products-grid{ gap:16px; }
+  .product-card{ width:90%; }
+  .cart-sidebar{ width:100%; right:-100%; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <a href="index.html" class="logo">Techno</a>
+  <nav id="menu">
+    <div class="dropdown" id="dropdown">
+      <a href="#" onclick="toggleDropdown(event)">PRODUCTS <span id="arrow">&#9658;</span></a>
+      <div class="dropdown-content" id="submenu">
+        <a href="side_bar.html">Solar Panels</a>
+        <a href="cctv.html">CCTV Cameras</a>
+        <a href="laptop.html">LAPTOPS</a>
+      </div>
+    </div>
+    <a href="about.html">About</a>
+    <a href="address.html">Contact</a>
+    <!-- ✅ CART BUTTON ADDED -->
+    <button class="cart-icon-btn" onclick="openCart()" title="View Cart">
+      🛒 <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </nav>
+  <button class="menu-btn" onclick="toggleMenu()">&#9776;</button>
+</header>
+
+<img src="https://www.shutterstock.com/image-illustration/multiple-street-surveillance-security-cameras-600nw-2730261261.jpg" class="img1">
+
+<!-- PRODUCTS SECTION — your exact products, not changed -->
+<section class="products-section">
+  <h2>Our Products</h2>
+  <div class="products-grid">
+
+    <!-- PRODUCT 1 -->
+    <div class="product-card fade-in">
+      <span class="sale-badge">Sale!</span>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZDJ7chFy66dmsa05OxSq5W5_XZh9a3krg2A&s" alt="CCTV Dome Camera">
+      <div class="product-info">
+        <div class="product-name">CCTV Dome Camera | HD 1080p | Night Vision | Indoor</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+        <div class="price-box">
+          <span class="old-price">Rs9,999</span>
+          <span class="new-price">Rs7,499</span>
+        </div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick="addToCart({id:'cc1',name:'CCTV Dome Camera',img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZDJ7chFy66dmsa05OxSq5W5_XZh9a3krg2A&s',price:'Rs7,499',priceNum:7499})">🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 2 -->
+    <div class="product-card fade-in">
+      <span class="sale-badge">Sale!</span>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr95G6a-uEi9srS_UddLXUdpIHk4pITCk20A&s" alt="Outdoor Camera">
+      <div class="product-info">
+        <div class="product-name">Outdoor Bullet Camera | Weatherproof | 4MP | Wide Angle</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="price-box">
+          <span class="old-price">Rs12,500</span>
+          <span class="new-price">Rs9,999</span>
+        </div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick="addToCart({id:'cc2',name:'Outdoor Bullet Camera',img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr95G6a-uEi9srS_UddLXUdpIHk4pITCk20A&s',price:'Rs9,999',priceNum:9999})">🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 3 -->
+    <div class="product-card fade-in">
+      <span class="sale-badge">Sale!</span>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHbYzrtrkmyzsda2p_WP44ju6lSadkFbiSQ&s" alt="PTZ Camera">
+      <div class="product-info">
+        <div class="product-name">PTZ Security Camera | 360° Rotation | 8MP | Smart Motion</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+        <div class="price-box">
+          <span class="old-price">Rs18,000</span>
+          <span class="new-price">Rs14,499</span>
+        </div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick="addToCart({id:'cc3',name:'PTZ Security Camera',img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHbYzrtrkmyzsda2p_WP44ju6lSadkFbiSQ&s',price:'Rs14,499',priceNum:14499})">🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 4 -->
+    <div class="product-card fade-in">
+      <span class="sale-badge">Sale!</span>
+      <img src="https://media.istockphoto.com/id/1789467564/photo/modern-public-cctv-camera-on-ceiling-with-copy-space.jpg?s=612x612&w=0&k=20&c=-Hn5qeazvI_llNYSn2mjhm4v_PYOHcpsALDsXDDvp7g=" alt="IP Camera">
+      <div class="product-info">
+        <div class="product-name">IP Security Camera | Ceiling Mount | 2MP | Remote Access</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="price-box">
+          <span class="old-price">Rs8,500</span>
+          <span class="new-price">Rs6,799</span>
+        </div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick="addToCart({id:'cc4',name:'IP Security Camera',img:'https://media.istockphoto.com/id/1789467564/photo/modern-public-cctv-camera-on-ceiling-with-copy-space.jpg?s=612x612&w=0&k=20&c=-Hn5qeazvI_llNYSn2mjhm4v_PYOHcpsALDsXDDvp7g=',price:'Rs6,799',priceNum:6799})">🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 5 -->
+    <div class="product-card fade-in">
+      <span class="sale-badge">Sale!</span>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxqToRnABIRNnL265LvB04fNTGWJ6d33LwAA&s" alt="Mini Camera">
+      <div class="product-info">
+        <div class="product-name">Mini Hidden Camera | 1080p | WiFi | Motion Detection</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9734;&#9734;</div>
+        <div class="price-box">
+          <span class="old-price">Rs5,999</span>
+          <span class="new-price">Rs4,299</span>
+        </div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick="addToCart({id:'cc5',name:'Mini Hidden Camera',img:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxqToRnABIRNnL265LvB04fNTGWJ6d33LwAA&s',price:'Rs4,299',priceNum:4299})">🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>
+    </div>
+
+    <!-- PRODUCT 6 -->
+    <div class="product-card fade-in">
+      <span class="sale-badge">Sale!</span>
+      <img src="https://www.shutterstock.com/image-photo/cctv-camera-outdoor-installed-on-600nw-2475912549.jpg" alt="Night Vision Camera">
+      <div class="product-info">
+        <div class="product-name">Night Vision CCTV | Outdoor Pole Mount | HD | IR 30m</div>
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <div class="price-box">
+          <span class="old-price">Rs11,000</span>
+          <span class="new-price">Rs8,999</span>
+        </div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick="addToCart({id:'cc6',name:'Night Vision CCTV',img:'https://www.shutterstock.com/image-photo/cctv-camera-outdoor-installed-on-600nw-2475912549.jpg',price:'Rs8,999',priceNum:8999})">🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div><h1>TECHNO</h1></div>
+  <div>
+    About
+    <div class="ab">About Family</div>
+    <div class="ab">Searching Is Easy For You!</div>
+    <div class="ab">Contact Us Here...</div>
+    <div class="ab">Refund Policy</div>
+  </div>
+  <div>
+    Quick Links
+    <div class="ab">All Collection</div>
+    <div class="ab">Join Us On Facebook</div>
+    <div class="ab">Join Us On Instagram</div>
+    <div class="ab">Join Us On Tiktok</div>
+  </div>
+  <div>
+    Talk To Us
+    <div class="ab">WhatsApp: +92300 7822548</div>
+    <div class="ab">Address: Rahim Yar Khan</div>
+  </div>
+</div>
+
+<!-- LIGHTBOX — kept exactly as yours -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightboxOutside(event)">
+  <span class="lightbox-close" onclick="closeLightbox()">&#x2715;</span>
+  <button class="lightbox-prev" onclick="changeImage(-1)">&#8249;</button>
+  <img id="lightbox-img" src="" alt="">
+  <button class="lightbox-next" onclick="changeImage(1)">&#8250;</button>
+</div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header">
+    <h3>🛒 Your Cart</h3>
+    <button class="cart-close-btn" onclick="closeCart()">&#x2715;</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">
+      <span class="empty-icon">🛒</span>
+      Your cart is empty!<br>Add some products.
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <div class="cart-subtotal">
+      <span>Total:</span>
+      <span id="cartTotal">Rs0</span>
+    </div>
+    <!-- <button class="btn-checkout" onclick="checkout()">✅ Checkout</button> -->
+    <button class="btn-clear-cart" onclick="clearCart()">🗑 Clear Cart</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ==============================
+// SHARED CART — same key as index.html, laptop.html, side_bar.html
+// ==============================
+const CART_KEY = 'techno_cart';
+let cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+function saveCart(){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+
+// ADD TO CART
+function addToCart(p){
+  const existing = cart.find(item => item.id === p.id);
+  if(existing){ existing.qty++; showToast('🛒 +1 ' + p.name); }
+  else { cart.push({ id:p.id, name:p.name, img:p.img, price:p.price, priceNum:p.priceNum, qty:1 }); showToast('✅ Added: ' + p.name); }
+  saveCart(); updateCartUI();
+}
+
+// BUY NOW
+function buyNow(p){ addToCart(p); openCart(); }
+
+function removeFromCart(id){ cart=cart.filter(i=>i.id!==id); saveCart(); updateCartUI(); renderCartItems(); }
+function changeQty(id,delta){ const item=cart.find(i=>i.id===id); if(!item) return; item.qty+=delta; if(item.qty<=0){removeFromCart(id);return;} saveCart(); updateCartUI(); renderCartItems(); }
+function clearCart(){ cart=[]; saveCart(); updateCartUI(); renderCartItems(); showToast('🗑 Cart cleared'); }
+function checkout(){ if(!cart.length){showToast('⚠️ Cart is empty!');return;} showToast('🎉 Order placed! Thank you!'); cart=[]; saveCart(); updateCartUI(); renderCartItems(); closeCart(); }
+
+function updateCartUI(){
+  const total = cart.reduce((sum,i)=>sum+i.qty,0);
+  const badge = document.getElementById('cartBadge');
+  badge.textContent = total; badge.classList.toggle('show', total>0);
+  renderCartItems();
+}
+
+function renderCartItems(){
+  const container = document.getElementById('cartItems');
+  const footer = document.getElementById('cartFooter');
+  if(!cart.length){
+    container.innerHTML = '<div class="cart-empty"><span class="empty-icon">🛒</span>Your cart is empty!<br>Add some products.</div>';
+    footer.style.display = 'none'; return;
+  }
+  footer.style.display = 'block';
+  let html = ''; let total = 0;
+  cart.forEach(item => {
+    total += item.priceNum * item.qty;
+    html += `<div class="cart-item">
+      <img src="${item.img}" alt="${item.name}" onerror="this.src='https://placehold.co/65x55?text=?'">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${item.price}</div>
+        <div class="qty-controls">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">&#x2715;</button>
+    </div>`;
+  });
+  container.innerHTML = html;
+  document.getElementById('cartTotal').textContent = 'Rs' + total.toLocaleString();
+}
+
+function openCart(){ document.getElementById('cartSidebar').classList.add('open'); document.getElementById('cartOverlay').classList.add('show'); document.body.style.overflow='hidden'; }
+function closeCart(){ document.getElementById('cartSidebar').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('show'); document.body.style.overflow=''; }
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// HEADER
+function toggleMenu(){ document.getElementById('menu').classList.toggle('show'); }
+function toggleDropdown(event){
+  event.preventDefault();
+  let drop = document.getElementById('dropdown');
+  let arrow = document.getElementById('arrow');
+  drop.classList.toggle('show');
+  arrow.innerHTML = drop.classList.contains('show') ? '&#9660;' : '&#9658;';
+}
+document.addEventListener('click', function(e){
+  let drop = document.getElementById('dropdown');
+  if(drop && !drop.contains(e.target)){ drop.classList.remove('show'); document.getElementById('arrow').innerHTML='&#9658;'; }
+});
+
+// LIGHTBOX — kept exactly as yours
+const images = [
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZDJ7chFy66dmsa05OxSq5W5_XZh9a3krg2A&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr95G6a-uEi9srS_UddLXUdpIHk4pITCk20A&s",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSHbYzrtrkmyzsda2p_WP44ju6lSadkFbiSQ&s",
+  "https://media.istockphoto.com/id/1789467564/photo/modern-public-cctv-camera-on-ceiling-with-copy-space.jpg?s=612x612",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxqToRnABIRNnL265LvB04fNTGWJ6d33LwAA&s",
+  "https://www.shutterstock.com/image-photo/cctv-camera-outdoor-installed-on-600nw-2475912549.jpg"
+];
+let currentIndex = 0;
+function openLightbox(index){ currentIndex=index; document.getElementById('lightbox-img').src=images[index]; document.getElementById('lightbox').classList.add('active'); document.body.style.overflow='hidden'; }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('active'); document.body.style.overflow=''; }
+function closeLightboxOutside(e){ if(e.target===document.getElementById('lightbox')) closeLightbox(); }
+function changeImage(dir){ currentIndex=(currentIndex+dir+images.length)%images.length; const img=document.getElementById('lightbox-img'); img.style.transition='opacity 0.15s'; img.style.opacity='0'; setTimeout(()=>{img.src=images[currentIndex];img.style.opacity='1';},150); }
+document.addEventListener('keydown',function(e){ if(!document.getElementById('lightbox').classList.contains('active')) return; if(e.key==='ArrowRight') changeImage(1); if(e.key==='ArrowLeft') changeImage(-1); if(e.key==='Escape') closeLightbox(); });
+
+// Scroll Fade-in
+const observer = new IntersectionObserver((entries)=>{ entries.forEach(el=>{if(el.isIntersecting) el.target.classList.add('visible');}); },{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+// ✅ Sync cart live when other pages update it
+window.addEventListener('storage', function(e){ if(e.key===CART_KEY){ cart=JSON.parse(e.newValue)||[]; updateCartUI(); } });
+
+// LOAD
+window.addEventListener('DOMContentLoaded', ()=>{ updateCartUI(); });
+</script>
+</body>
+</html>

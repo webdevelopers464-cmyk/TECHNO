@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Techno</title>
+<style>
+html{ scroll-behavior:smooth; }
+body{ margin:0; font-family:sans-serif; }
+header{ display:flex; justify-content:space-around; align-items:center; padding:15px; background:black; position:sticky; top:0; z-index:1000; }
+.logo{ color:white; font-size:20px; text-decoration:none; }
+nav{ display:flex; gap:20px; align-items:center; }
+nav a{ color:white; text-decoration:none; }
+.dropdown{ position:relative; }
+.dropdown-content{ display:none; position:absolute; top:30px; background:black; flex-direction:column; min-width:150px; z-index:9999; }
+.dropdown-content a{ padding:10px; display:block; border-bottom:1px solid gray; }
+.dropdown.show .dropdown-content{ display:block; }
+.menu-btn{ display:none; }
+.cart-icon-btn{ background:none; border:none; color:white; font-size:22px; cursor:pointer; position:relative; padding:0; }
+.cart-badge{ position:absolute; top:-8px; right:-10px; background:#e63946; color:white; font-size:11px; font-weight:bold; border-radius:50%; width:18px; height:18px; display:none; align-items:center; justify-content:center; }
+.cart-badge.show{ display:flex; }
+@media(max-width:768px){ nav{ position:fixed; left:-250px; top:0; width:250px; height:100%; background:black; flex-direction:column; padding-top:60px; transition:0.3s; z-index:999; } nav a{ padding:15px; border-bottom:1px solid gray; } nav.show{ left:0; } .menu-btn{ display:block; font-size:25px; background:none; border:none; color:white; cursor:pointer; } }
+.img1{ width:100%; display:block; }
+.products-section{ padding:40px 20px; background:#f5f5f5; }
+.products-section h2{ text-align:center; font-size:30px; font-weight:700; margin-bottom:24px; color:#111; }
+.filter-tabs{ display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-bottom:34px; }
+.tab-btn{ padding:10px 24px; border:none; background:#4a2ecf; color:white; font-size:15px; font-weight:600; border-radius:6px; cursor:pointer; transition:background 0.2s,transform 0.15s; }
+.tab-btn:hover{ background:#3520a8; transform:translateY(-2px); }
+.tab-btn.active{ background:#111; }
+.products-grid{ display:flex; flex-wrap:wrap; gap:24px; justify-content:center; max-width:1200px; margin:0 auto; }
+.product-card{ background:white; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.10); width:250px; position:relative; overflow:hidden; transition:transform 0.3s,box-shadow 0.3s; display:flex; flex-direction:column; animation:fadeUp 0.4s ease both; }
+@keyframes fadeUp{ from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+.product-card:hover{ transform:translateY(-6px); box-shadow:0 12px 32px rgba(0,0,0,0.18); }
+.sale-badge{ position:absolute; top:12px; right:12px; background:#4a2ecf; color:white; font-size:12px; font-weight:bold; padding:4px 10px; border-radius:4px; z-index:2; }
+.product-card > img{ width:100%; height:190px; object-fit:contain; padding:16px 16px 0 16px; background:white; box-sizing:border-box; }
+.product-info{ padding:14px 16px; flex:1; display:flex; flex-direction:column; }
+.product-name{ font-size:13.5px; color:#222; text-align:center; font-weight:600; line-height:1.5; margin-bottom:10px; min-height:60px; }
+.stars{ color:#f5a623; font-size:16px; text-align:center; margin-bottom:8px; letter-spacing:2px; }
+.price-box{ display:flex; justify-content:center; align-items:center; gap:10px; margin-bottom:14px; }
+.old-price{ text-decoration:line-through; color:#aaa; font-size:13px; }
+.new-price{ color:#222; font-size:15px; font-weight:bold; }
+.card-btns{ display:flex; gap:8px; padding:0 16px 16px 16px; }
+.btn-cart{ flex:1; padding:9px 6px; border:2px solid #222; background:white; color:#222; font-size:13px; font-weight:600; border-radius:6px; cursor:pointer; transition:background 0.2s,color 0.2s; }
+.btn-cart:hover{ background:#222; color:white; }
+.btn-buy{ flex:1; padding:9px 6px; border:none; background:#4a2ecf; color:white; font-size:13px; font-weight:600; border-radius:6px; cursor:pointer; transition:background 0.2s; }
+.btn-buy:hover{ background:#3520a8; }
+
+/* CART SIDEBAR */
+.cart-overlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9998; display:none; }
+.cart-overlay.show{ display:block; }
+.cart-sidebar{ position:fixed; top:0; right:-420px; width:400px; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; box-shadow:-4px 0 20px rgba(0,0,0,0.2); transition:right 0.35s ease; }
+.cart-sidebar.open{ right:0; }
+.cart-header{ display:flex; justify-content:space-between; align-items:center; padding:20px; background:#111; color:white; }
+.cart-header h3{ margin:0; font-size:20px; }
+.cart-close-btn{ background:none; border:none; color:white; font-size:28px; cursor:pointer; line-height:1; padding:0; }
+.cart-close-btn:hover{ color:#e63946; }
+.cart-items{ flex:1; overflow-y:auto; padding:16px; }
+.cart-empty{ text-align:center; padding:60px 20px; color:#aaa; font-size:16px; }
+.cart-empty .empty-icon{ font-size:60px; display:block; margin-bottom:12px; }
+.cart-item{ display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid #eee; }
+.cart-item img{ width:65px; height:55px; object-fit:contain; border-radius:6px; background:#f5f5f5; padding:4px; }
+.cart-item-info{ flex:1; }
+.cart-item-name{ font-size:13px; font-weight:600; color:#222; margin-bottom:4px; }
+.cart-item-price{ font-size:13px; color:#4a2ecf; font-weight:bold; }
+.qty-controls{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+.qty-btn{ width:26px; height:26px; border:1px solid #ddd; background:white; border-radius:4px; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; transition:background 0.2s; }
+.qty-btn:hover{ background:#f0f0f0; }
+.qty-num{ font-size:14px; font-weight:600; min-width:20px; text-align:center; }
+.cart-item-remove{ background:none; border:none; color:#ccc; font-size:20px; cursor:pointer; padding:0; transition:color 0.2s; }
+.cart-item-remove:hover{ color:#e63946; }
+.cart-footer{ padding:16px 20px; border-top:2px solid #eee; background:#fafafa; }
+.cart-subtotal{ display:flex; justify-content:space-between; align-items:center; font-size:16px; font-weight:700; margin-bottom:14px; }
+.cart-subtotal span:last-child{ color:#4a2ecf; font-size:18px; }
+.btn-checkout{ width:100%; padding:14px; background:#4a2ecf; color:white; border:none; border-radius:8px; font-size:16px; font-weight:700; cursor:pointer; transition:background 0.2s; }
+.btn-checkout:hover{ background:#3520a8; }
+.btn-clear-cart{ width:100%; padding:10px; background:white; color:#e63946; border:2px solid #e63946; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; margin-top:8px; transition:background 0.2s,color 0.2s; }
+.btn-clear-cart:hover{ background:#e63946; color:white; }
+.toast{ position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px); background:#222; color:white; padding:12px 28px; border-radius:30px; font-size:14px; z-index:99999; opacity:0; transition:all 0.35s ease; pointer-events:none; white-space:nowrap; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.footer{ display:flex; justify-content:space-around; padding-top:50px; background:#000; color:white; width:100%; height:200px; box-sizing:border-box; }
+.ab{ color:white; }
+@media(max-width:500px){ .cart-sidebar{ width:100%; right:-100%; } .footer{ flex-direction:column; text-align:center; align-items:center; height:auto; padding-bottom:30px; } .products-grid{ gap:16px; } .product-card{ width:90%; } .filter-tabs{ gap:6px; } .tab-btn{ padding:8px 14px; font-size:13px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo">Techno</a>
+  <nav id="menu">
+    <div class="dropdown" id="dropdown">
+      <a href="#" onclick="toggleDropdown(event)">PRODUCTS <span id="arrow">&#9658;</span></a>
+      <div class="dropdown-content">
+        <a href="side_bar.html">Solar Panels</a>
+        <a href="cctv.html">CCTV Cameras</a>
+        <a href="laptop.html">LAPTOPS</a>
+      </div>
+    </div>
+    <a href="about.html">About</a>
+    <a href="address.html">Contact</a>
+    <button class="cart-icon-btn" onclick="openCart()" title="View Cart">
+      🛒 <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </nav>
+  <button class="menu-btn" onclick="toggleMenu()">&#9776;</button>
+</header>
+
+<img src="mar.png" class="img1">
+
+<section class="products-section">
+  <h2>Top Products</h2>
+  <div class="filter-tabs">
+    <button class="tab-btn active" onclick="filterProducts('chromebooks',this)">Chromebooks</button>
+    <button class="tab-btn" onclick="filterProducts('laptops',this)">Laptops</button>
+    <button class="tab-btn" onclick="filterProducts('smartphones',this)">Smartphones</button>
+    <button class="tab-btn" onclick="filterProducts('accessories',this)">Accessories</button>
+    <button class="tab-btn" onclick="filterProducts('tabs',this)">Tabs</button>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<div class="footer">
+  <div><h1>TECHNO</h1></div>
+  <div>About<div class="ab">About Family</div><div class="ab">Searching Is Easy!</div><div class="ab">Contact Us Here...</div><div class="ab">Refund Policy</div></div>
+  <div>Quick Links<div class="ab">All Collection</div><div class="ab">Join Us On Facebook</div><div class="ab">Join Us On Instagram</div><div class="ab">Join Us On Tiktok</div></div>
+  <div>Talk To Us<div class="ab">WhatsApp: +92300 7822548</div><div class="ab">Address: Rahim Yar Khan</div></div>
+</div>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cartSidebar">
+  <div class="cart-header"><h3>🛒 Your Cart</h3><button class="cart-close-btn" onclick="closeCart()">&#x2715;</button></div>
+  <div class="cart-items" id="cartItems"><div class="cart-empty"><span class="empty-icon">🛒</span>Your cart is empty!<br>Add some products.</div></div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <div class="cart-subtotal"><span>Total:</span><span id="cartTotal">Rs0</span></div>
+    <!-- <button class="btn-checkout" onclick="checkout()">✅ Checkout</button> -->
+    <button class="btn-clear-cart" onclick="clearCart()">🗑 Clear Cart</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ==============================
+// PRODUCTS DATA — your exact images, not changed
+// ==============================
+const allProducts = {
+  chromebooks: [
+    { id:'c1', name:"HP Chromebook 11 G4 | 16GB Storage | 2GB RAM | 11.6\" Display | Dual Core", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGNfjzXnYW81pFPAOIMRn5YV0uUL-_YrDRtg&s", old:"Rs9,999", price:"Rs6,999", priceNum:6999, stars:4 },
+    { id:'c2', name:"Lenovo ChromeBook N21 | 4GB RAM | 16GB Storage | 11.6\" | Rotatable Webcam", img:"https://starcity.pk/wp-content/uploads/2020/09/Lenovo-N21.jpg", old:"Rs9,499", price:"Rs7,499", priceNum:7499, stars:5 },
+    { id:'c3', name:"Lenovo N23 Chromebook | 16GB Storage | 4GB RAM | 11.6\" | Rotatable Camera", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQifs3RhxIiD12Is4Bes9ER9aktMv8aRdei9g&s", old:"Rs9,999", price:"Rs7,999", priceNum:7999, stars:4 },
+    { id:'c4', name:"HP Chromebook 11A G8 EE | 4GB RAM | 32GB Storage | 11.6\" | Play Store", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7OL8qmmfHhSCSrPRZy6PK9XU2djfE8AVwCQ&s", old:"Rs10,499", price:"Rs8,499", priceNum:8499, stars:5 },
+    { id:'c5', name:"Acer Chromebook 311 | 4GB RAM | 32GB eMMC | 11.6\" HD | 10Hr Battery", img:"https://image-cdn.ubuy.com/restored-dell-latitude-3190-11-6/400_400_100/69055b662b7b7eb79b0968dc.jpg", old:"Rs11,500", price:"Rs9,299", priceNum:9299, stars:5 },
+    { id:'c6', name:"Dell Chromebook 3100 | 4GB RAM | 32GB | 11.6\" HD | Intel Celeron | WiFi", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr0f5K7dYQRx_TkVrRxp9_H03deUqZ08OXiw&s", old:"Rs13,999", price:"Rs11,499", priceNum:11499, stars:4 },
+  ],
+  laptops: [
+    { id:'l1', name:"Dell Latitude 3190 | 4GB RAM | 128GB SSD | 11.6\" HD | Windows 10 Pro", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDYy4Of7PXXJFeIm78CxDe9oZVDA5Vo9LFfQ&s", old:"Rs35,000", price:"Rs28,999", priceNum:28999, stars:4 },
+    { id:'l2', name:"HP ProBook 450 G7 | Core i5 | 8GB RAM | 256GB SSD | 15.6\" FHD", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-UtRlShgq1mgFEgXaO3mpT13h3JUq0ywy4w&s", old:"Rs65,000", price:"Rs54,999", priceNum:54999, stars:5 },
+    { id:'l3', name:"Lenovo ThinkPad E14 | Core i5 | 8GB RAM | 512GB SSD | 14\" FHD", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv-Dat7arSu_K-QbiqpLJw-fL1AFnIyVLZWQ&s", old:"Rs72,000", price:"Rs61,999", priceNum:61999, stars:5 },
+    { id:'l4', name:"Acer Aspire 5 | Ryzen 5 | 8GB RAM | 512GB SSD | 15.6\" FHD | Backlit KB", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTMMa7Lkh65NyXAfWeu5DcnfEvYm1a-OqpYEg&s", old:"Rs68,500", price:"Rs57,499", priceNum:57499, stars:4 },
+    { id:'l5', name:"HP Pavilion 15 | Core i7 | 16GB RAM | 512GB SSD | NVIDIA GTX | Win 11", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRD0f1O9zIOVjHy0bXPQgeNtJDOqy61QjTrTQ&s", old:"Rs95,000", price:"Rs82,999", priceNum:82999, stars:5 },
+    { id:'l6', name:"Asus VivoBook 15 | Core i5 | 8GB RAM | 256GB SSD | 15.6\" FHD | Win 11", img:"https://discountstore.pk/cdn/shop/files/ausu-vivobbok15-x513ea-bq1704w-15-6-i5-1135g7-8gb-512gb-ssd-win11-home-700x700.webp?v=1734448523", old:"Rs58,000", price:"Rs49,499", priceNum:49499, stars:4 },
+  ],
+  smartphones: [
+    { id:'s1', name:"Samsung Galaxy A55 | 8GB RAM | 256GB | 6.6\" AMOLED | 50MP | 5000mAh", img:"https://img.drz.lazcdn.com/static/pk/p/5e3418577822b76621c28976bb9e9261.png_720x720q80.png", old:"Rs85,000", price:"Rs74,999", priceNum:74999, stars:5 },
+    { id:'s2', name:"Motorola G Play 2024 | 4GB RAM | 64GB | 6.5\" HD+ | 5000mAh | Android 14", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5SFmx9beOyzWSrza3E5cU05l3iELctmkp9A&s", old:"Rs32,000", price:"Rs26,999", priceNum:26999, stars:4 },
+    { id:'s3', name:"Motorola Moto G 5G 2024 | 4GB RAM | 128GB | 6.6\" | 50MP Camera", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3sHIhyBKzUChkSdWBxHeJFxpzoFmp3wIyGw&s", old:"Rs42,000", price:"Rs35,999", priceNum:35999, stars:5 },
+    { id:'s4', name:"Infinix Hot 40 Pro | 8GB RAM | 256GB | 6.78\" | 108MP | 5000mAh Battery", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwnMkAtgoDbZL9u4JTpYjWHNaLLeBzk6AMiQ&s", old:"Rs38,000", price:"Rs31,999", priceNum:31999, stars:4 },
+    { id:'s5', name:"Tecno Spark 20 Pro | 8GB RAM | 128GB | 6.78\" | 50MP | Android 14", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx_33-5MbjwZY2-zvci3oT5BW4cFxy9E6xVg&s", old:"Rs29,000", price:"Rs24,499", priceNum:24499, stars:4 },
+    { id:'s6', name:"Samsung Galaxy S21 Ultra 5G", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSZiEgH1GLwJWnkuF4PBZz19PKcF_M9MxcZdw&s", old:"Rs34,000", price:"Rs28,499", priceNum:28499, stars:4 },
+  ],
+  accessories: [
+    { id:'a1', name:"Wireless Mouse | 2.4GHz | Ergonomic Design | Long Battery | USB Receiver", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0NbFCGqFUvO_b3bZan5NQiZb92BbV35mSBA&s", old:"Rs2,500", price:"Rs1,799", priceNum:1799, stars:5 },
+    { id:'a2', name:"Laptop Bag 15.6\" | Waterproof | Multi Pocket | Shoulder Strap | Black", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnh39Kik9k9GkgxD6CA1sHES-6Sbjy23mdyg&s", old:"Rs3,500", price:"Rs2,699", priceNum:2699, stars:4 },
+    { id:'a3', name:"USB-C Hub 7-in-1 | HDMI 4K | USB 3.0 | SD Card | Fast Charging | Aluminium", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrKN-cV8D-hD91CDwPoPhoOGvAoun9BUk_Dg&s", old:"Rs4,999", price:"Rs3,799", priceNum:3799, stars:5 },
+    { id:'a4', name:"Mechanical Keyboard | RGB Backlit | Tenkeyless | Blue Switch | USB Wired", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQjvSayfJpALBCQToS1ttxKYBCOe56GI6ht7w&s", old:"Rs6,500", price:"Rs4,999", priceNum:4999, stars:5 },
+    { id:'a5', name:"Laptop Cooling Pad | 5 Fans | RGB | Adjustable Height | USB Powered", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQR2qtp_2Yp5i_-hm-NvPXb4C3guAJTzBQAAg&s", old:"Rs3,200", price:"Rs2,399", priceNum:2399, stars:4 },
+    { id:'a6', name:"Screen Protector Kit | Anti Glare | Microfiber Cloth | Universal 15.6\"", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9MlnN360viI5r51s8Ws9YD8z006wHqyvx3Q&s", old:"Rs1,200", price:"Rs799", priceNum:799, stars:4 },
+  ],
+  tabs: [
+    { id:'t1', name:"Samsung Galaxy Tab A8 2019 | 32GB | 2GB RAM | 8.0\" | 5100mAh | WiFi", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbzfZZiQzfseF5WX4PJvhEpUKCEeC5TUa5TA&s", old:"Rs16,999", price:"Rs14,999", priceNum:14999, stars:5 },
+    { id:'t2', name:"Lenovo Tab M8 HD | 32GB Storage | 2GB RAM | 5MP Camera | 5000mAh Battery", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ942c_XeeZb6L1yu5EaSp_b3x3qEb0ae8CEQ&s", old:"Rs16,499", price:"Rs15,499", priceNum:15499, stars:4 },
+    { id:'t3', name:"Huawei D Tab Compact | 32GB | 3GB RAM | Kirin 659 | 8.0\" | 4980mAh", img:"https://img.drz.lazcdn.com/static/pk/p/8d3b1e8b51712fa80f94af7ce1bd4377.jpg_720x720q80.jpg", old:"Rs17,499", price:"Rs15,999", priceNum:15999, stars:5 },
+    { id:'t4', name:"Samsung Galaxy Tab A 2018 | 32GB | 2GB RAM | Quad Core | 8.0\" Display", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKE6Uo-I_cbNa7K0q16XFVQnAlhkXrKps14g&s", old:"Rs20,499", price:"Rs16,999", priceNum:16999, stars:5 },
+    { id:'t5', name:"Lenovo Docomo D-42A | 64GB | 4GB RAM | Snapdragon 665 | 8.0\" WiFi", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnf5TQHAlIfkpaNlc5l4SX1DYry8l4klEtzg&s", old:"Rs20,499", price:"Rs16,999", priceNum:16999, stars:4 },
+    { id:'t6', name:"Alcatel Joy Tab 2 | 32GB | 2GB RAM | MediaTek MT8766B | 8.0\" | 4G LTE", img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSai1XdSvsBQX_SLNK8-kR5vGmTRDlHBZn6tg&s", old:"Rs17,499", price:"Rs15,999", priceNum:15999, stars:5 },
+  ]
+};
+
+// ==============================
+// SHARED CART KEY — same as index.html
+// ==============================
+const CART_KEY = 'techno_cart';
+let cart = JSON.parse(localStorage.getItem(CART_KEY)) || [];
+function saveCart(){ localStorage.setItem(CART_KEY, JSON.stringify(cart)); }
+
+// RENDER STARS
+function renderStars(n){ let s=''; for(let i=1;i<=5;i++) s+=i<=n?'&#9733;':'&#9734;'; return s; }
+
+// RENDER PRODUCTS
+function filterProducts(category, btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const grid=document.getElementById('productsGrid');
+  grid.innerHTML='';
+  allProducts[category].forEach((p,i)=>{
+    const card=document.createElement('div');
+    card.className='product-card';
+    card.style.animationDelay=(i*0.07)+'s';
+    const shortName=p.name.split('|')[0].trim();
+    card.innerHTML=`
+      <span class="sale-badge">Sale!</span>
+      <img src="${p.img}" alt="${shortName}" onerror="this.src='https://placehold.co/250x190?text=No+Image'">
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="stars">${renderStars(p.stars)}</div>
+        <div class="price-box"><span class="old-price">${p.old}</span><span class="new-price">${p.price}</span></div>
+      </div>
+      <div class="card-btns">
+        <button class="btn-cart" onclick='addToCart(${JSON.stringify(p)})'>🛒 Add to Cart</button>
+        <button class="btn-buy"><a href="ordered.html" class="btn-buy">Buy Now</a></button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// CART FUNCTIONS
+function addToCart(p){
+  const existing=cart.find(item=>item.id===p.id);
+  if(existing){ existing.qty++; showToast('🛒 +1 '+p.name.split('|')[0].trim()); }
+  else { cart.push({id:p.id,name:p.name.split('|')[0].trim(),img:p.img,price:p.price,priceNum:p.priceNum,qty:1}); showToast('✅ Added: '+p.name.split('|')[0].trim()); }
+  saveCart(); updateCartUI();
+}
+function buyNow(p){ addToCart(p); openCart(); }
+function removeFromCart(id){ cart=cart.filter(item=>item.id!==id); saveCart(); updateCartUI(); renderCartItems(); }
+function changeQty(id,delta){ const item=cart.find(i=>i.id===id); if(!item) return; item.qty+=delta; if(item.qty<=0){removeFromCart(id);return;} saveCart(); updateCartUI(); renderCartItems(); }
+function clearCart(){ cart=[]; saveCart(); updateCartUI(); renderCartItems(); showToast('🗑 Cart cleared'); }
+function checkout(){ if(!cart.length){showToast('⚠️ Cart is empty!');return;} showToast('🎉 Order placed! Thank you!'); cart=[]; saveCart(); updateCartUI(); renderCartItems(); closeCart(); }
+
+function updateCartUI(){
+  const total=cart.reduce((sum,i)=>sum+i.qty,0);
+  const badge=document.getElementById('cartBadge');
+  badge.textContent=total; badge.classList.toggle('show',total>0);
+  renderCartItems();
+}
+
+function renderCartItems(){
+  const container=document.getElementById('cartItems');
+  const footer=document.getElementById('cartFooter');
+  if(!cart.length){
+    container.innerHTML='<div class="cart-empty"><span class="empty-icon">🛒</span>Your cart is empty!<br>Add some products.</div>';
+    footer.style.display='none'; return;
+  }
+  footer.style.display='block';
+  let html=''; let total=0;
+  cart.forEach(item=>{
+    total+=item.priceNum*item.qty;
+    html+=`<div class="cart-item">
+      <img src="${item.img}" alt="${item.name}" onerror="this.src='https://placehold.co/65x55?text=?'">
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-price">${item.price}</div>
+        <div class="qty-controls">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">&#x2715;</button>
+    </div>`;
+  });
+  container.innerHTML=html;
+  document.getElementById('cartTotal').textContent='Rs'+total.toLocaleString();
+}
+
+function openCart(){ document.getElementById('cartSidebar').classList.add('open'); document.getElementById('cartOverlay').classList.add('show'); document.body.style.overflow='hidden'; }
+function closeCart(){ document.getElementById('cartSidebar').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('show'); document.body.style.overflow=''; }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+// HEADER
+function toggleMenu(){ document.getElementById('menu').classList.toggle('show'); }
+function toggleDropdown(e){ e.preventDefault(); const drop=document.getElementById('dropdown'); drop.classList.toggle('show'); document.getElementById('arrow').innerHTML=drop.classList.contains('show')?'&#9660;':'&#9658;'; }
+document.addEventListener('click',function(e){ const drop=document.getElementById('dropdown'); if(drop&&!drop.contains(e.target)){drop.classList.remove('show');document.getElementById('arrow').innerHTML='&#9658;';} });
+
+// ✅ Sync cart live if index.html updates it in another tab
+window.addEventListener('storage',function(e){ if(e.key===CART_KEY){ cart=JSON.parse(e.newValue)||[]; updateCartUI(); } });
+
+// LOAD
+window.addEventListener('DOMContentLoaded',()=>{
+  filterProducts('chromebooks',document.querySelector('.tab-btn.active'));
+  updateCartUI();
+});
+</script>
+</body>
+</html>
